@@ -4,7 +4,6 @@ import Video from "../models/Video.js";
 
 export const addComment = async (req, res, next) => {
     const newComment = {...req.body, userId: req.user.id};
-    
     try {
         const comment = await Comment.create(newComment);
         res.status(200).json({

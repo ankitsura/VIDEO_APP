@@ -131,3 +131,69 @@ export const subscribed = async (req, res, next) => {
         next(err);
     }
 }
+
+export const like = async (req, res, next) => {
+    const id = req.user.id;
+    const videoId = req.params.videoId;
+    try {
+        const video = await Video.findById(videoId);
+        const isLiked = video.likes.findIndex((like) => like === id);
+        const isDisliked = video.dislikes.findIndex((dislike) => dislike === id);
+        if(isLiked === -1){
+            // await Video.findByIdAndUpdate(videoId, {$push: {likes: id}});
+            video.likes.push(req.user.id);
+            await video.save();
+            if(isDisliked !== -1){
+                // await Video.findByIdAndUpdate(videoId, {$pull: {dislikes: id}});
+                video.dislikes.pull(req.user.id);
+                await video.save();
+            }
+            return res.status(200).json({
+                video,
+                message: "Video Liked"
+            });
+        }else{
+            video.likes.pull(req.user.id);
+            await video.save();
+            return res.status(200).json({
+                video,
+                message: "Video Unliked"
+            });
+        }
+    } catch (err) {
+        next(err);
+    }
+}
+
+export const dislike = async (req, res, next) => {
+    const id = req.user.id;
+    const videoId = req.params.videoId;
+    try {
+        const video = await Video.findById(videoId);
+        const isLiked = video.likes.findIndex((like) => like === id);
+        const isDisliked = video.dislikes.findIndex((dislike) => dislike === id);
+        if(isDisliked === -1){
+            // await Video.findByIdAndUpdate(videoId, {$push: {likes: id}});
+            video.dislikes.push(req.user.id);
+            await video.save();
+            if(isLiked !== -1){
+                // await Video.findByIdAndUpdate(videoId, {$pull: {dislikes: id}});
+                video.likes.pull(req.user.id);
+                await video.save();
+            }
+            return res.status(200).json({
+                video,
+                message: "Video Disliked"
+            });
+        }else{
+            video.dislikes.pull(req.user.id);
+            await video.save();
+            return res.status(200).json({
+                video,
+                message: "Dislike Removed"
+            });
+        }
+    } catch (err) {
+        next(err);
+    }
+}

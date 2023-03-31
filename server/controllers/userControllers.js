@@ -81,19 +81,3 @@ export const unsubscribe = async (req, res, next) => {
         next(err);
     }
 }
-
-export const like = async (req, res, next) => {
-    try {
-        
-    } catch (err) {
-        next(err);
-    }
-}
-
-export const dislike = async (req, res, next) => {
-    try {
-        
-    } catch (err) {
-        next(err);
-    }
-}
