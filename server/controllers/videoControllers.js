@@ -22,6 +22,15 @@ export const getVideo = async (req, res, next) => {
         next(err);
     }
 }
+export const getAllVideos = async (req, res, next) => {
+    try {
+        const videos = await Video.find();
+        if(!videos) return next(createError("Videos not found"));
+        res.status(200).json(videos);
+    } catch (err) {
+        next(err);
+    }
+}
 
 export const updateVideo = async (req, res, next) => {
     const videoId = req.params.id;
@@ -87,18 +96,37 @@ export const trend = async (req, res, next) => {
     }
 }
 
-export const subscribed = async (req, res, next) => {
-    const videoId = req.params.id;
-    const userId = req.user.id;
+export const getByTags = async (req, res, next) => {
+    const tags = req.query.tags.split(',');
+    console.log(tags);
     try {
-        const user = await User.findById(userId);
+        const videos = await Video.find({tags: {$in : tags}}).limit(20);
+        res.status(200).json(videos);
+    } catch (err) {
+        next(err);
+    }
+}
+
+export const search = async (req, res, next) => {
+    const searchQuery = req.query.search;
+    try {
+        const videos = await Video.find({title: {$regex : searchQuery, $options: "i"}}).limit(40);
+        res.status(200).json(videos);
+    } catch (err) {
+        next(err);
+    }
+}
+
+export const subscribed = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.id);
         const subscribedChannels = user.subscribedUsers; // got all the channels subscribed by the user
-
-        const list =  await Promise.all(subscribedChannels.map((channelId) => {
-            return Video.find({userId: channelId}).exec();
-        }));
-
-        res.status(200).json(list);
+        const list = await Promise.all(
+            subscribedChannels.map(async (channelId) => {
+              return await Video.find({ userId: channelId });
+            })
+          );
+        res.status(200).json(list.flat().sort((a, b) => b.createdAt - a.createdAt));
     } catch (err) {
         next(err);
     }

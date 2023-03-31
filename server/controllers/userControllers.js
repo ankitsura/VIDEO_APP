@@ -53,12 +53,18 @@ export const getUser = async (req, res, next) => {
 }
 
 export const subscribe = async (req, res, next) => {
-    const channelsUserId = req.parsms.id;
+    const channelsUserId = req.params.id;
     try {
-        await User.findById(req.user.id, {$push: {subscribedUsers: channelsUserId}});
-        await User.findByIdAndUpdate(channelsUserId, { $inc: {subscribers: 1}})
+        const user = await User.findById(req.user.id);
+        const subscribedUsers = user.subscribedUsers;
+        const isSubscribed = subscribedUsers.filter((subscriber) => subscriber === req.params.id);
+        if(!isSubscribed){
+            await User.findByIdAndUpdate(req.user.id, {$push: {subscribedUsers: channelsUserId}});
+            await User.findByIdAndUpdate(channelsUserId, { $inc: {subscribers: 1}})
+            res.status(200).json('Subscribed to this channel');
+        }
+        res.status(400).json('Yoy are already Subscribed to this Channel');
 
-        res.status(200).json('Subscribed to this channel');
     } catch (err) {
         next(err);
     }
