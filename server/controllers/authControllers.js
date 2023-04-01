@@ -9,10 +9,11 @@ import { createError } from "../error.js";
 dotenv.config();
 
 export const signup = async (req, res, next) => {
+    const {userName, email, password} = req.body;
     try {
         const salt = bcrypt.genSaltSync(10);
-        const hash = bcrypt.hashSync(req.body.password, salt);
-        const newUser = await User.create({...req.body, password: hash});
+        const hash = bcrypt.hashSync(password, salt);
+        const newUser = await User.create({name: userName, email, password: hash});
         res.status(200).json({
             user: newUser,
             message: "Signed up successfully"
@@ -34,7 +35,6 @@ export const signin = async (req, res, next) => {
 
         res.cookie('access_token', token).status(200).json({
             others,
-            message: "Signed in successfully"
         });        
     } catch (err) {
         next(err);
