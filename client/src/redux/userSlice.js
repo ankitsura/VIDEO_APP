@@ -14,9 +14,9 @@ export const userSlice = createSlice({
             state.loading= true;
         },
         loginSuccess: (state, action) => {
-            state.loading= false;
             state.currentUser= action.payload.others;
-            localStorage.setItem('access_token', action?.payload?.token);
+            localStorage.setItem('access_token',JSON.stringify(action?.payload));
+            state.loading= false;
         },
         loginFailure: (state) => {
             state.loading= false;

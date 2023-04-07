@@ -3,7 +3,7 @@ import User from "../models/User.js";
 import Video from "../models/Video.js";
 
 export const addVideo = async (req, res, next) => {
-    const userId = req.user.id;
+    const userId = req.user._id;
     try {
         const newVideo = await Video.create({userId, ...req.body});
         res.status(200).json(newVideo);
@@ -34,7 +34,7 @@ export const getAllVideos = async (req, res, next) => {
 
 export const updateVideo = async (req, res, next) => {
     const videoId = req.params.id;
-    const userId = req.user.id;
+    const userId = req.user._id;
     try {
         const video = await Video.findById(videoId);
         if(!video) return next(createError("Video not found"));
@@ -51,7 +51,7 @@ export const updateVideo = async (req, res, next) => {
 
 export const deleteVideo = async (req, res, next) => {
     const videoId = req.params.id;
-    const userId = req.user.id;
+    const userId = req.user._id;
     try {
         const video = await Video.findById(videoId);
         if(!video) return next(createError("Video not found"));
@@ -69,7 +69,7 @@ export const deleteVideo = async (req, res, next) => {
 
 export const addView = async (req, res, next) => {
     const videoId = req.params.id;
-    const userId = req.user.id;
+    const userId = req.user._id;
     try {
         const addedView = await Video.findByIdAndUpdate(videoId, { $inc: {views: 1}});
         res.status(200).json('View Added');
@@ -98,7 +98,6 @@ export const trend = async (req, res, next) => {
 
 export const getByTags = async (req, res, next) => {
     const tags = req.query.tags.split(',');
-    console.log(tags);
     try {
         const videos = await Video.find({tags: {$in : tags}}).limit(20);
         res.status(200).json(videos);
@@ -119,8 +118,7 @@ export const search = async (req, res, next) => {
 
 export const subscribed = async (req, res, next) => {
     try {
-        const user = await User.findById(req.user.id);
-        console.log(user);
+        const user = await User.findById(req.user._id);
         const subscribedChannels = user.subscribedUsers; // got all the channels subscribed by the user
         const list = await Promise.all(
             subscribedChannels.map(async (channelId) => {
@@ -134,19 +132,20 @@ export const subscribed = async (req, res, next) => {
 }
 
 export const like = async (req, res, next) => {
-    const id = req.user.id;
-    const videoId = req.params.videoId;
+    const id = req.user._id;
+    const videoId = req.params.id;
+    
     try {
         const video = await Video.findById(videoId);
         const isLiked = video.likes.findIndex((like) => like === id);
         const isDisliked = video.dislikes.findIndex((dislike) => dislike === id);
         if(isLiked === -1){
             // await Video.findByIdAndUpdate(videoId, {$push: {likes: id}});
-            video.likes.push(req.user.id);
+            video.likes.push(req.user._id);
             await video.save();
             if(isDisliked !== -1){
                 // await Video.findByIdAndUpdate(videoId, {$pull: {dislikes: id}});
-                video.dislikes.pull(req.user.id);
+                video.dislikes.pull(req.user._id);
                 await video.save();
             }
             return res.status(200).json({
@@ -154,7 +153,7 @@ export const like = async (req, res, next) => {
                 message: "Video Liked"
             });
         }else{
-            video.likes.pull(req.user.id);
+            video.likes.pull(req.user._id);
             await video.save();
             return res.status(200).json({
                 video,
@@ -167,19 +166,19 @@ export const like = async (req, res, next) => {
 }
 
 export const dislike = async (req, res, next) => {
-    const id = req.user.id;
-    const videoId = req.params.videoId;
+    const id = req.user._id;
+    const videoId = req.params.id;
     try {
         const video = await Video.findById(videoId);
         const isLiked = video.likes.findIndex((like) => like === id);
         const isDisliked = video.dislikes.findIndex((dislike) => dislike === id);
         if(isDisliked === -1){
             // await Video.findByIdAndUpdate(videoId, {$push: {likes: id}});
-            video.dislikes.push(req.user.id);
+            video.dislikes.push(req.user._id);
             await video.save();
             if(isLiked !== -1){
                 // await Video.findByIdAndUpdate(videoId, {$pull: {dislikes: id}});
-                video.likes.pull(req.user.id);
+                video.likes.pull(req.user._id);
                 await video.save();
             }
             return res.status(200).json({
@@ -187,7 +186,7 @@ export const dislike = async (req, res, next) => {
                 message: "Video Disliked"
             });
         }else{
-            video.dislikes.pull(req.user.id);
+            video.dislikes.pull(req.user._id);
             await video.save();
             return res.status(200).json({
                 video,

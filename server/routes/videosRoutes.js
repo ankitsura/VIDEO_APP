@@ -4,19 +4,21 @@ import { verifyToken } from '../verifyToken.js';
 
 const router = express.Router();
 
-router.get('/find/:id', getVideo);
 router.get('/', getAllVideos);
+router.get('/find/:id', getVideo);
 router.get('/trend', trend);
 router.get('/random', random);
 router.get('/tags', getByTags);
 router.get('/search', search);
+router.get('/sub', verifyToken, subscribed);
 
 router.post('/', verifyToken, addVideo);
-router.put('/:id', verifyToken, updateVideo);
+
+router.patch('/:id', verifyToken, updateVideo);
+router.patch('/view/:id', verifyToken, addView);
+router.patch('/like/:id', verifyToken, like);
+router.patch('/dislike/:id', verifyToken, dislike);
+
 router.delete('/:id', verifyToken, deleteVideo);
-router.get('/sub', verifyToken, subscribed);
-router.put('/view/:id', verifyToken, addView);
-router.put('/like/:videoId', verifyToken, like);
-router.put('/dislike/:videoId', verifyToken, dislike);
 
 export default router;

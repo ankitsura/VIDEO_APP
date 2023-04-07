@@ -13,7 +13,7 @@ export const getAllUsers = async (req, res, next) => {
 
 export const update = async (req, res, next) => {
     const id = req.params.id;
-    if(req.user.id === id){
+    if(req.user._id === id){
         try {
             const updatedUser = await User.findByIdAndUpdate(id, {$set: req.body}, {new: true});
             res.status(200).json(updatedUser);
@@ -28,7 +28,7 @@ export const update = async (req, res, next) => {
 export const deleteUser = async (req, res, next) => {
     const id = req.params.id;
 
-    if(req.user.id === id){
+    if(req.user._id === id){
         try {
             await User.findByIdAndDelete(id);
             res.status(200).json("User has been deleted");
@@ -55,11 +55,11 @@ export const getUser = async (req, res, next) => {
 export const subscribe = async (req, res, next) => {
     const channelsUserId = req.params.id;
     try {
-        const user = await User.findById(req.user.id);
+        const user = await User.findById(req.user._id);
         const subscribedUsers = user.subscribedUsers;
         const isSubscribed = subscribedUsers.filter((subscriber) => subscriber === req.params.id);
         if(!isSubscribed){
-            await User.findByIdAndUpdate(req.user.id, {$push: {subscribedUsers: channelsUserId}});
+            await User.findByIdAndUpdate(req.user._id, {$push: {subscribedUsers: channelsUserId}});
             await User.findByIdAndUpdate(channelsUserId, { $inc: {subscribers: 1}})
             res.status(200).json('Subscribed to this channel');
         }
@@ -73,7 +73,7 @@ export const subscribe = async (req, res, next) => {
 export const unsubscribe = async (req, res, next) => {
     const channelsUserId = req.parsms.id;
     try {
-        await User.findById(req.user.id, {$pull: {subscribedUsers: channelsUserId}});
+        await User.findById(req.user._id, {$pull: {subscribedUsers: channelsUserId}});
         await User.findByIdAndUpdate(channelsUserId, { $inc: {subscribers: -1}})
 
         res.status(200).json('Unsubscribed to this channel');

@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
-import ThumbDownOffAltOutlinedIcon from "@mui/icons-material/ThumbDownOffAltOutlined";
-import ReplyOutlinedIcon from "@mui/icons-material/ReplyOutlined";
-import AddTaskOutlinedIcon from "@mui/icons-material/AddTaskOutlined";
+import { AddTaskOutlined, ReplyOutlined, ThumbUpOutlined, ThumbUpAlt, ThumbDownOffAltOutlined, ThumbDownAlt } from "@mui/icons-material";
 import Comments from "../components/Comments";
 import Card from "../components/Card";
+import { useLocation } from "react-router-dom";
+import { dislikeVideo, getChannel, getSingleVideo, likeVideo } from "../api";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchStart, fetchSuccess, handleDislikeVideo, handleLikeVideo } from "../redux/videoSlice";
+import moment from "moment";
 
 const Container = styled.div`
   display: flex;
@@ -105,6 +107,35 @@ const Subscribe = styled.button`
 `;
 
 const Video = () => {
+  
+  const dispatch = useDispatch();
+  const videoId = useLocation().pathname.split('/')[2];
+
+  const { currentUser } = useSelector((state) => state.user);
+  const { currentVideo } = useSelector((state) => state.video);
+  const [channel, setChannel] = useState({});
+
+  const handleLike = () => {
+    likeVideo(videoId).then((res) => dispatch(handleLikeVideo(res.data)));
+  }
+  const handleDislike = () => {
+    dislikeVideo(videoId).then((res) => dispatch(handleDislikeVideo(res.data)));
+  }
+
+  useEffect(() => {
+    dispatch(fetchStart);
+    getSingleVideo(videoId)
+      .then((currentVideo) => {
+        getChannel(currentVideo.data.userId)
+        .then((channel) => {
+          setChannel(channel.data);
+        })
+        dispatch(fetchSuccess(currentVideo.data));
+      })
+      .catch((err) => console.log(err));
+  },[videoId, dispatch]);
+
+
   return (
     <Container>
       <Content>
@@ -114,41 +145,38 @@ const Video = () => {
             height="720"
             src="https://www.youtube.com/embed/k3Vfj-e1Ma4"
             title="YouTube video player"
-            frameborder="0"
+            frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
+            allowFullScreen
           ></iframe>
         </VideoWrapper>
-        <Title>Test Video</Title>
+        <Title>{currentVideo?.title}</Title>
         <Details>
-          <Info>7,948,154 views • Jun 22, 2022</Info>
+          <Info>{currentVideo?.views} views • {moment(currentVideo?.createdAt).fromNow()}</Info>
           <Buttons>
-            <Button>
-              <ThumbUpOutlinedIcon /> 123
+            <Button onClick={handleLike}>
+              {currentVideo?.likes?.includes(currentUser?._id) ? <ThumbUpAlt /> : <ThumbUpOutlined />} {currentVideo?.likes?.length}
+            </Button>
+            <Button onClick={handleDislike}>
+            {currentVideo?.dislikes?.includes(currentUser?._id) ? <ThumbDownAlt /> : <ThumbDownOffAltOutlined />} {currentVideo?.dislikes?.length}
             </Button>
             <Button>
-              <ThumbDownOffAltOutlinedIcon /> Dislike
+              <ReplyOutlined /> Share
             </Button>
             <Button>
-              <ReplyOutlinedIcon /> Share
-            </Button>
-            <Button>
-              <AddTaskOutlinedIcon /> Save
+              <AddTaskOutlined /> Save
             </Button>
           </Buttons>
         </Details>
         <Hr />
         <Channel>
           <ChannelInfo>
-            <Image src="https://yt3.ggpht.com/yti/APfAmoE-Q0ZLJ4vk3vqmV4Kwp0sbrjxLyB8Q4ZgNsiRH=s88-c-k-c0x00ffffff-no-rj-mo" />
+            <Image src={channel?.img} />
             <ChannelDetail>
-              <ChannelName>Lama Dev</ChannelName>
-              <ChannelCounter>200K subscribers</ChannelCounter>
+              <ChannelName>{channel?.name}</ChannelName>
+              <ChannelCounter>{channel?.subscribers} subscribers</ChannelCounter>
               <Description>
-                Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                Doloribus laborum delectus unde quaerat dolore culpa sit aliquam
-                at. Vitae facere ipsum totam ratione exercitationem. Suscipit
-                animi accusantium dolores ipsam ut.
+                {currentVideo?.desc}
               </Description>
             </ChannelDetail>
           </ChannelInfo>
@@ -157,7 +185,7 @@ const Video = () => {
         <Hr />
         <Comments/>
       </Content>
-      <Recommendation>
+      {/* <Recommendation>
         <Card type="sm"/>
         <Card type="sm"/>
         <Card type="sm"/>
@@ -171,7 +199,7 @@ const Video = () => {
         <Card type="sm"/>
         <Card type="sm"/>
         <Card type="sm"/>
-      </Recommendation>
+      </Recommendation> */}
     </Container>
   );
 };

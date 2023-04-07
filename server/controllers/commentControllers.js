@@ -3,7 +3,7 @@ import Comment from "../models/Comments.js";
 import Video from "../models/Video.js";
 
 export const addComment = async (req, res, next) => {
-    const newComment = {...req.body, userId: req.user.id};
+    const newComment = {...req.body, userId: req.user._id};
     try {
         const comment = await Comment.create(newComment);
         res.status(200).json({
@@ -31,7 +31,7 @@ export const deleteComment = async (req, res, next) => {
     try {
         const comment = await Comment.findById(req.params.id);
         const video = await Video.findById(req.params.videoId);
-        if(req.user.id === comment.userId || req.user.id === video.userId){
+        if(req.user._id === comment.userId || req.user._id === video.userId){
             await Comment.findByIdAndDelete(req.params.id);
             res.status(200).json("The Comment has been Deleted");
         }else{
@@ -44,7 +44,7 @@ export const deleteComment = async (req, res, next) => {
 
 // export const updateComment = async (req, res, next) => {
 //     const comment = req.body;
-//     const userId = req.user.id;
+//     const userId = req.user._id;
 //     try {
 //         const comment = await Comment.create();
 //         if(!users) return next(createError(404, "No user to display"));

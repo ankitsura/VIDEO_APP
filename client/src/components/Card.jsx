@@ -55,22 +55,24 @@ const Info = styled.div`
 
 const Card = ({ type, video }) => {
 
+  const videoCreatorId = video?.userId;
+  // const videoId = video?._id;
   const [channel, setChannel] = useState({});
 
   useEffect(() => {
     try {
       const fetchChannel = async () => {
-        const res = await axios.get(`http://localhost:5000/api/users/find/${video.userId}`);
+        const res = await axios.get(`http://localhost:5000/api/users/find/${videoCreatorId}`);
         setChannel(res.data);
       };
       fetchChannel(); 
     } catch (error) {
       console.log(error);
     }
-  },[video.userId]);
+  },[videoCreatorId]);
 
   return (
-    <Link to="/video/test" style={{ textDecoration: "none" }}>
+    <Link to={`/video/${video._id}`} style={{ textDecoration: "none" }}>
       <Container type={type}>
         <Image
           type={type}

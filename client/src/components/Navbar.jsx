@@ -88,16 +88,16 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const [currentUser, setCurrentUser] = useState(localStorage?.getItem('access_token'));
+  const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage?.getItem('access_token')));
+
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/signin');
+    navigate('/');
     setCurrentUser(null);
   }
 
   useEffect(() => {
-    const token = currentUser;
-    console.log(token);
+    const token = currentUser?.token;
      if (token) {
        const decodedToken = jwtDecode(token);
        if(decodedToken.exp * 1000 < new Date().getTime()){
@@ -108,7 +108,7 @@ const Navbar = () => {
   
   
   useEffect(() => {
-    setCurrentUser(localStorage?.getItem('access_token'));
+    setCurrentUser(JSON.parse(localStorage.getItem('access_token')));
   }, [location]);
 
   return (
@@ -127,8 +127,8 @@ const Navbar = () => {
         {currentUser ? (
           <User>
             <VideoCallOutlinedIcon/>
-            <Avatar src={currentUser && decodedToken.imgUrl} />
-            {currentUser.name}
+            <Avatar src={currentUser.others?.img} />
+            {currentUser.others.name}
             <Button onClick={handleLogout}>
               <AccountCircleOutlinedIcon />
               Logout
