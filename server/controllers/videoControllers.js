@@ -120,6 +120,7 @@ export const search = async (req, res, next) => {
 export const subscribed = async (req, res, next) => {
     try {
         const user = await User.findById(req.user.id);
+        console.log(user);
         const subscribedChannels = user.subscribedUsers; // got all the channels subscribed by the user
         const list = await Promise.all(
             subscribedChannels.map(async (channelId) => {

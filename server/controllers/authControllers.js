@@ -30,12 +30,36 @@ export const signin = async (req, res, next) => {
 
         if(!bcrypt.compareSync(req.body.password, user.password)) return next(createError(400, 'Incorrect username or password'));
 
-        const token = jwt.sign({id: user._id}, process.env.JWT_SECRET);
         const {password, ...others} = user._doc;
+        const token = jwt.sign({user: others}, process.env.JWT_SECRET, {expiresIn: '1h'} );
 
-        res.cookie('access_token', token).status(200).json({
+        res.status(200).json({
             others,
-        });        
+            token
+        });  
+    } catch (err) {
+        next(err);
+    }
+}
+
+export const googleAuth = async (req, res, next) => {
+    try {
+        const {userName, email, img} =  req.body;
+        const user = await User.findOne({email});
+        if(!user){
+            const newUser = await User.create({name: userName, email, img, fromGoogle: true});
+            const token = jwt.sign({user: newUser}, process.env.JWT_SECRET);
+            res.status(200).json({
+                others: newUser,
+                token
+            });  
+        } else{
+            const token = jwt.sign({user}, process.env.JWT_SECRET, {expiresIn: '1h'} );
+            res.status(200).json({
+                others: user,
+                token
+            });  
+        }
     } catch (err) {
         next(err);
     }

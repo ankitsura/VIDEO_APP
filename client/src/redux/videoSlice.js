@@ -6,8 +6,8 @@ const initialState = {
     error: false,
 };
 
-export const userSlice = createSlice({
-    name: 'user',
+export const videoSlice = createSlice({
+    name: 'video',
     initialState,
     reducers: {
         loginStart: (state) => {
@@ -15,22 +15,18 @@ export const userSlice = createSlice({
         },
         loginSuccess: (state, action) => {
             state.loading= false;
-            state.currentUser= action.payload.others;
-            localStorage.setItem('access_token', action?.payload?.token);
+            state.currentUser= action.payload;
         },
         loginFailure: (state) => {
             state.loading= false;
             state.error= true;
         },
         logout: (state) => {
-            state.currentUser= null;
-            state.loading= false;
-            state.error= false;
-            localStorage.clear();
+            state= initialState;
         }
     }
 });
 
-export const { loginStart, loginSuccess, loginFailure, logout } = userSlice.actions;
+export const { loginStart, loginSuccess, loginFailure, logout } = videoSlice.actions;
 
-export default userSlice.reducer;
+export default videoSlice.reducer;

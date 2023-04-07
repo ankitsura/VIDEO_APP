@@ -74,7 +74,7 @@ const Card = ({ type, video }) => {
       <Container type={type}>
         <Image
           type={type}
-          src={video.imgUrl}
+          src={video?.imgUrl}
         />
         <Details type={type}>
           <ChannelImage
