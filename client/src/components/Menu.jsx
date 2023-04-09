@@ -16,7 +16,7 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import SettingsBrightnessOutlinedIcon from "@mui/icons-material/SettingsBrightnessOutlined";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 const Container = styled.div`
   /* width */
@@ -80,6 +80,7 @@ const Title = styled.h2`
 const Menu = ({ darkMode, setDarkMode }) => {
 
   const {currentUser} = useSelector(state => state.user);
+  const location = useLocation();
 
   return (
     <Container>
@@ -96,7 +97,7 @@ const Menu = ({ darkMode, setDarkMode }) => {
             Explore
           </Item>
         </Link>
-        <Link to="subscriptions" style={{textDecoration: "none", color: "inherit"}}>
+        <Link to="/subscriptions" style={{textDecoration: "none", color: "inherit"}}>
           <Item>
             <SubscriptionsOutlinedIcon />
             Subscriptions
@@ -112,7 +113,7 @@ const Menu = ({ darkMode, setDarkMode }) => {
           History
         </Item>
         <Hr />
-        {!currentUser &&
+        {!currentUser && location.pathname !== '/signin' &&
           <>
             <Login>
               Sign in to like videos, comment, and subscribe.

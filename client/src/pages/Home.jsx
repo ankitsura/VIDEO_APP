@@ -13,6 +13,8 @@ const Home = ({type}) => {
 
   const [videos, setVideos] = useState([]);
 
+  // console.log(videos);
+
   useEffect(() => {
     try {
       const fetch = async () => {

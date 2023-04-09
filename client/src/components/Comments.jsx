@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import styled from "styled-components";
+import { fetchComments } from "../api";
 import Comment from "./Comment";
 
 const Container = styled.div``;
@@ -26,7 +28,14 @@ const Input = styled.input`
   width: 100%;
 `;
 
-const Comments = () => {
+const Comments = (videoId) => {
+
+  const [comments, setComments] = useState([]);
+
+  useEffect(() => {
+    fetchComments(videoId)
+  })
+
   return (
     <Container>
       <NewComment>

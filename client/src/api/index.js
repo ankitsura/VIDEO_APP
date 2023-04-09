@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { subscriptions } from '../redux/userSlice';
+import { fetchSuccess, handleSubscribersCount } from '../redux/videoSlice';
 
 const API = axios.create({baseURL: "http://localhost:5000/api/"});
 
@@ -11,12 +13,24 @@ API.interceptors.request.use((req) => {
 })
 
 export const fetchVideos = (type) => API.get(`videos/${type}`);
-export const getSingleVideo = (id) => API.get(`videos/find/${id}`);
+export const fetchComments = (videoId) => API.get(`comments/${videoId}`);
+
+export const getSingleVideo = (id) => async (dispatch) => {
+   const video = (await API.get(`videos/find/${id}`)).data;
+   const channel = (await API.get(`users/find/${video.userId}`)).data;
+   dispatch(fetchSuccess({video, channel}));
+}
+
 export const likeVideo = (id) => API.patch(`videos/like/${id}`);
 export const dislikeVideo = (id) => API.patch(`videos/dislike/${id}`);
 
 export const getChannel = (userId) => API.get(`users/find/${userId}`);
 
+export const handleSubscribeChannel = (channelId) => async (dispatch) => {
+    const channel =  (await API.put(`users/sub/${channelId}`)).data.resChannel;
+    await dispatch(subscriptions(channel));
+    dispatch(handleSubscribersCount(channel));
+}
 
 //auth API
 export const signIn = async (formData) => await API.post(`auth/signin`, formData);

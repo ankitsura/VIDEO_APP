@@ -22,14 +22,18 @@ export const videoSlice = createSlice({
             state.error= true;
         },
         handleLikeVideo: (state, action) => {
-            state.currentVideo= action.payload.video;
+            state.currentVideo.video= action.payload.video;
         },
         handleDislikeVideo: (state, action) => {
-            state.currentVideo= action.payload.video;
+            state.currentVideo.video= action.payload.video;
+        },
+        handleSubscribersCount: (state, action) => {
+            console.log('handleSubscribersCount',action.payload);
+            state.currentVideo.channel.subscribers= action.payload.subscribers;
         },
     }
 });
 
-export const { fetchStart, fetchSuccess, fetchFailure, handleLikeVideo, handleDislikeVideo } = videoSlice.actions;
+export const { fetchStart, fetchSuccess, fetchFailure, handleLikeVideo, handleDislikeVideo, handleSubscribersCount } = videoSlice.actions;
 
 export default videoSlice.reducer;

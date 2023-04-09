@@ -92,11 +92,12 @@ const Navbar = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/');
     setCurrentUser(null);
+    navigate('/');
   }
-
+  
   useEffect(() => {
+    setCurrentUser(JSON.parse(localStorage?.getItem('access_token')));
     const token = currentUser?.token;
      if (token) {
        const decodedToken = jwtDecode(token);
@@ -104,11 +105,6 @@ const Navbar = () => {
         handleLogout();
         }
       }
-  });
-  
-  
-  useEffect(() => {
-    setCurrentUser(JSON.parse(localStorage.getItem('access_token')));
   }, [location]);
 
   return (
@@ -135,7 +131,7 @@ const Navbar = () => {
             </Button>
           </User>
           
-        ) : (
+        ) : ( location.pathname !== '/signin' &&
           <Link to="signin" style={{ textDecoration: "none" }}>
             <Button>
               <AccountCircleOutlinedIcon />

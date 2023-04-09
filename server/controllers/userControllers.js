@@ -52,32 +52,34 @@ export const getUser = async (req, res, next) => {
     }
 }
 
-export const subscribe = async (req, res, next) => {
+export const toogleSubscribe = async (req, res, next) => {
     const channelsUserId = req.params.id;
     try {
         const user = await User.findById(req.user._id);
         const subscribedUsers = user.subscribedUsers;
-        const isSubscribed = subscribedUsers.filter((subscriber) => subscriber === req.params.id);
-        if(!isSubscribed){
-            await User.findByIdAndUpdate(req.user._id, {$push: {subscribedUsers: channelsUserId}});
-            await User.findByIdAndUpdate(channelsUserId, { $inc: {subscribers: 1}})
-            res.status(200).json('Subscribed to this channel');
+        const isSubscribed = subscribedUsers.filter((subscriber) => subscriber === String(channelsUserId));
+        if(isSubscribed.length === 0){
+            await User.findByIdAndUpdate(req.user._id, { $push: {subscribedUsers: String(channelsUserId)}});
+            const subscribedChannel = await User.findByIdAndUpdate(channelsUserId, { $inc: {subscribers: 1}}, {new: true})
+            console.log('subscribedChannel',subscribedChannel);
+            return res.status(200).json({
+                resChannel: subscribedChannel,
+                message: 'Subscribed to this channel'
+            });
+        }else{
+            await User.findByIdAndUpdate(req.user._id, {$pull: {subscribedUsers: String(channelsUserId)}});
+
+            const UnsubscribedChannel = await User.findByIdAndUpdate(channelsUserId, { $inc: {subscribers: -1}}, {new: true})
+            console.log('UnsubscribedChannel',UnsubscribedChannel);
+            return res.status(200).json({
+                resChannel: UnsubscribedChannel,
+                message: 'Unsubscribed to this channel'
+            });  
         }
-        res.status(400).json('Yoy are already Subscribed to this Channel');
-
     } catch (err) {
         next(err);
     }
 }
 
-export const unsubscribe = async (req, res, next) => {
-    const channelsUserId = req.parsms.id;
-    try {
-        await User.findById(req.user._id, {$pull: {subscribedUsers: channelsUserId}});
-        await User.findByIdAndUpdate(channelsUserId, { $inc: {subscribers: -1}})
 
-        res.status(200).json('Unsubscribed to this channel');
-    } catch (err) {
-        next(err);
-    }
-}
+

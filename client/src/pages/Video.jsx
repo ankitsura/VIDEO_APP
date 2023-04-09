@@ -4,9 +4,9 @@ import { AddTaskOutlined, ReplyOutlined, ThumbUpOutlined, ThumbUpAlt, ThumbDownO
 import Comments from "../components/Comments";
 import Card from "../components/Card";
 import { useLocation } from "react-router-dom";
-import { dislikeVideo, getChannel, getSingleVideo, likeVideo } from "../api";
+import { dislikeVideo, getSingleVideo, handleSubscribeChannel, likeVideo } from "../api";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchStart, fetchSuccess, handleDislikeVideo, handleLikeVideo } from "../redux/videoSlice";
+import { handleDislikeVideo, handleLikeVideo } from "../redux/videoSlice";
 import moment from "moment";
 
 const Container = styled.div`
@@ -17,7 +17,8 @@ const Container = styled.div`
 const Content = styled.div`
   flex: 5;
 `;
-const VideoWrapper = styled.div``;
+const VideoWrapper = styled.div`
+`;
 
 const Title = styled.h1`
   font-size: 18px;
@@ -105,6 +106,11 @@ const Subscribe = styled.button`
   padding: 10px 20px;
   cursor: pointer;
 `;
+const VideoFrame = styled.video`
+  max-height: 75vh;
+  width: 100%;
+  object-fit: cover;
+`;
 
 const Video = () => {
   
@@ -112,8 +118,10 @@ const Video = () => {
   const videoId = useLocation().pathname.split('/')[2];
 
   const { currentUser } = useSelector((state) => state.user);
-  const { currentVideo } = useSelector((state) => state.video);
-  const [channel, setChannel] = useState({});
+  
+  const video = useSelector((state) => state.video.currentVideo?.video);
+  const channel = useSelector((state) => state.video.currentVideo?.channel);
+  const isSubscribed = (currentUser?.subscribedUsers)?.includes(channel?._id);
 
   const handleLike = () => {
     likeVideo(videoId).then((res) => dispatch(handleLikeVideo(res.data)));
@@ -122,44 +130,34 @@ const Video = () => {
     dislikeVideo(videoId).then((res) => dispatch(handleDislikeVideo(res.data)));
   }
 
-  useEffect(() => {
-    dispatch(fetchStart);
-    getSingleVideo(videoId)
-      .then((currentVideo) => {
-        getChannel(currentVideo.data.userId)
-        .then((channel) => {
-          setChannel(channel.data);
-        })
-        dispatch(fetchSuccess(currentVideo.data));
-      })
-      .catch((err) => console.log(err));
-  },[videoId, dispatch]);
+  const toogleSubscribe = () => {
+      dispatch(handleSubscribeChannel(channel._id));
+    }
 
+  useEffect(() => {
+    dispatch(getSingleVideo(videoId));
+  },[dispatch, videoId]);
 
   return (
     <Container>
       <Content>
         <VideoWrapper>
-          <iframe
-            width="100%"
-            height="720"
-            src="https://www.youtube.com/embed/k3Vfj-e1Ma4"
-            title="YouTube video player"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          ></iframe>
+          <VideoFrame src={video?.videoUrl} />
         </VideoWrapper>
-        <Title>{currentVideo?.title}</Title>
+        <Title>{video?.title}</Title>
         <Details>
-          <Info>{currentVideo?.views} views • {moment(currentVideo?.createdAt).fromNow()}</Info>
+          <Info>{(video?.views) ? video.views : 0} views • {moment(video?.createdAt).fromNow()}</Info>
           <Buttons>
-            <Button onClick={handleLike}>
-              {currentVideo?.likes?.includes(currentUser?._id) ? <ThumbUpAlt /> : <ThumbUpOutlined />} {currentVideo?.likes?.length}
-            </Button>
-            <Button onClick={handleDislike}>
-            {currentVideo?.dislikes?.includes(currentUser?._id) ? <ThumbDownAlt /> : <ThumbDownOffAltOutlined />} {currentVideo?.dislikes?.length}
-            </Button>
+            { currentUser && 
+              <>
+                <Button onClick={handleLike}>
+                  {video?.likes?.includes(currentUser?._id) ? <ThumbUpAlt /> : <ThumbUpOutlined />} {video?.likes?.length}
+                </Button>
+                <Button onClick={handleDislike}>
+                {video?.dislikes?.includes(currentUser?._id) ? <ThumbDownAlt /> : <ThumbDownOffAltOutlined />} {video?.dislikes?.length}
+                </Button>
+              </>
+            }
             <Button>
               <ReplyOutlined /> Share
             </Button>
@@ -176,14 +174,18 @@ const Video = () => {
               <ChannelName>{channel?.name}</ChannelName>
               <ChannelCounter>{channel?.subscribers} subscribers</ChannelCounter>
               <Description>
-                {currentVideo?.desc}
+                {video?.desc}
               </Description>
             </ChannelDetail>
           </ChannelInfo>
-          <Subscribe>SUBSCRIBE</Subscribe>
+          { !currentUser ?
+            <Subscribe style={{cursor:'unset', backgroundColor: 'grey'}}>SUBSCRIBE</Subscribe>
+            :
+            <Subscribe onClick={toogleSubscribe}>{isSubscribed ? `SUBSCRIBED` : `SUBSCRIBE`}</Subscribe>
+          }
         </Channel>
         <Hr />
-        <Comments/>
+        <Comments videoId={videoId}/>
       </Content>
       {/* <Recommendation>
         <Card type="sm"/>
