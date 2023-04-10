@@ -136,7 +136,7 @@ const Video = () => {
 
   useEffect(() => {
     dispatch(getSingleVideo(videoId));
-  },[dispatch, videoId]);
+  },[videoId]);
 
   return (
     <Container>
@@ -185,7 +185,7 @@ const Video = () => {
           }
         </Channel>
         <Hr />
-        <Comments videoId={videoId}/>
+        <Comments videoId={videoId} currentUser={currentUser} />
       </Content>
       {/* <Recommendation>
         <Card type="sm"/>

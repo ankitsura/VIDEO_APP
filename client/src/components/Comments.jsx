@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { fetchComments } from "../api";
 import Comment from "./Comment";
@@ -28,27 +28,32 @@ const Input = styled.input`
   width: 100%;
 `;
 
-const Comments = (videoId) => {
-
+const Comments = ({videoId}) => {
+  const {currentUser} = useSelector(state => state.user);
   const [comments, setComments] = useState([]);
-
+  
   useEffect(() => {
-    fetchComments(videoId)
-  })
+    const fetch = async () =>{
+      const res = (await fetchComments(videoId)).data;
+      setComments(res);
+    }
+    fetch();
+  },[videoId])
 
   return (
     <Container>
+      { currentUser &&
       <NewComment>
-        <Avatar src="https://yt3.ggpht.com/yti/APfAmoE-Q0ZLJ4vk3vqmV4Kwp0sbrjxLyB8Q4ZgNsiRH=s88-c-k-c0x00ffffff-no-rj-mo" />
+        <Avatar src={currentUser?.img} />
         <Input placeholder="Add a comment..." />
       </NewComment>
-      <Comment/>
-      <Comment/>
-      <Comment/>
-      <Comment/>
-      <Comment/>
-      <Comment/>
-      <Comment/>
+      }
+      {
+        comments?.map(comment => 
+          <Comment key={comment._id} comment={comment} />
+        )
+      }
+      
     </Container>
   );
 };

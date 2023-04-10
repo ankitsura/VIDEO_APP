@@ -14,6 +14,7 @@ API.interceptors.request.use((req) => {
 
 export const fetchVideos = (type) => API.get(`videos/${type}`);
 export const fetchComments = (videoId) => API.get(`comments/${videoId}`);
+export const getUser = (userId) => API.get(`users/find/${userId}`);
 
 export const getSingleVideo = (id) => async (dispatch) => {
    const video = (await API.get(`videos/find/${id}`)).data;
@@ -24,7 +25,6 @@ export const getSingleVideo = (id) => async (dispatch) => {
 export const likeVideo = (id) => API.patch(`videos/like/${id}`);
 export const dislikeVideo = (id) => API.patch(`videos/dislike/${id}`);
 
-export const getChannel = (userId) => API.get(`users/find/${userId}`);
 
 export const handleSubscribeChannel = (channelId) => async (dispatch) => {
     const channel =  (await API.put(`users/sub/${channelId}`)).data.resChannel;
