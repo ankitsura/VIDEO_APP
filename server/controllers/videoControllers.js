@@ -2,10 +2,10 @@ import { createError } from "../error.js";
 import User from "../models/User.js";
 import Video from "../models/Video.js";
 
-export const addVideo = async (req, res, next) => {
+export const uploadVideo = async (req, res, next) => {
     const userId = req.user._id;
     try {
-        const newVideo = await Video.create({userId, ...req.body});
+        const newVideo = await Video.create({userId, ...req.body, tags: req.body.tags.replaceAll(" ","").split(',')});
         res.status(200).json(newVideo);
     } catch (err) {
         next(err);

@@ -43,11 +43,11 @@ const Comment = ({comment}) => {
 const [commentUser, setCommentUser] = useState({})
 const dispatch = useDispatch();
 
-
 useEffect(() => {
     const fetch = async () =>{
       const res = (await getUser(comment.userId)).data;
       setCommentUser(res);
+      console.log('rendeed')
     }
     fetch();
   },[comment.userId])

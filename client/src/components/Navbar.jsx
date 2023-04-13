@@ -8,6 +8,7 @@ import VideoCallOutlinedIcon from "@mui/icons-material/VideoCallOutlined";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logout } from "../redux/userSlice";
+import Upload from "./Upload";
 
 const Container = styled.div`
   position: sticky;
@@ -89,6 +90,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage?.getItem('access_token')));
+  const [open, setOpen] = useState(false);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -105,43 +107,48 @@ const Navbar = () => {
         handleLogout();
         }
       }
-  }, [location]);
+  }, [currentUser, location]);
 
   return (
-    <Container>
-      <Wrapper>
-        <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
-          <Logo>
-            <Img src={YouTube} />
-            YouTube
-          </Logo>
-        </Link>
-        <Search>
-          <Input placeholder="Search" />
-          <SearchOutlinedIcon />
-        </Search>
-        {currentUser ? (
-          <User>
-            <VideoCallOutlinedIcon/>
-            <Avatar src={currentUser.others?.img} />
-            {currentUser.others.name}
-            <Button onClick={handleLogout}>
-              <AccountCircleOutlinedIcon />
-              Logout
-            </Button>
-          </User>
-          
-        ) : ( location.pathname !== '/signin' &&
-          <Link to="signin" style={{ textDecoration: "none" }}>
-            <Button>
-              <AccountCircleOutlinedIcon />
-              SIGN IN
-            </Button>
+    <>
+      <Container>
+        <Wrapper>
+          <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+            <Logo>
+              <Img src={YouTube} />
+              YouTube
+            </Logo>
           </Link>
-        )
-        }
-      </Wrapper>
-    </Container>
+          <Search>
+            <Input placeholder="Search" />
+            <SearchOutlinedIcon />
+          </Search>
+          {currentUser ? (
+            <User>
+              <VideoCallOutlinedIcon style={{cursor:'pointer'}} onClick={ () => setOpen(true) } />
+              <Avatar src={currentUser.others?.img} />
+              {currentUser.others.name}
+              <Button onClick={handleLogout}>
+                <AccountCircleOutlinedIcon />
+                Logout
+              </Button>
+            </User>
+            
+          ) : ( location.pathname !== '/signin' &&
+            <Link to="signin" style={{ textDecoration: "none" }}>
+              <Button>
+                <AccountCircleOutlinedIcon />
+                SIGN IN
+              </Button>
+            </Link>
+          )
+          }
+        </Wrapper>
+      </Container>
+      {
+        open && <Upload setOpen={setOpen} />
+      }
+    </>
   );
 };
 

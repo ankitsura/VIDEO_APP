@@ -28,7 +28,6 @@ export const videoSlice = createSlice({
             state.currentVideo.video= action.payload.video;
         },
         handleSubscribersCount: (state, action) => {
-            console.log('handleSubscribersCount',action.payload);
             state.currentVideo.channel.subscribers= action.payload.subscribers;
         },
     }

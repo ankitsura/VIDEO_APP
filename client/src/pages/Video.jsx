@@ -142,7 +142,7 @@ const Video = () => {
     <Container>
       <Content>
         <VideoWrapper>
-          <VideoFrame src={video?.videoUrl} />
+          <VideoFrame src={video?.videoUrl} type="video/mp4" controls={true}/>
         </VideoWrapper>
         <Title>{video?.title}</Title>
         <Details>
