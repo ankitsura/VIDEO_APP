@@ -14,6 +14,8 @@ API.interceptors.request.use((req) => {
 
 export const uploadVideo = (videoData) => (API.post(`videos`, videoData).data);
 export const fetchVideos = (type) => API.get(`videos/${type}`);
+export const fetchSearchVideos = (searchQuery) => API.get(`videos/search?searchQuery=${searchQuery}`);
+export const fetchVideosByTags = (tags) => API.get(`videos/tags?tags=${tags}`);
 export const fetchComments = (videoId) => API.get(`comments/${videoId}`);
 export const getUser = (userId) => API.get(`users/find/${userId}`);
 

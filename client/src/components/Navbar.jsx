@@ -12,7 +12,9 @@ import Upload from "./Upload";
 
 const Container = styled.div`
   position: sticky;
+  display: block;
   top: 0;
+  z-index: 10;
   background-color: ${({ theme }) => theme.bgLighter};
   height: 56px;
 `;
@@ -48,12 +50,14 @@ const Search = styled.div`
   padding: 5px;
   border: 1px solid #ccc;
   border-radius: 3px;
+  color: ${({ theme }) => theme.text};
 `;
 
 const Input = styled.input`
   border: none;
   background-color: transparent;
   outline: none;
+  flex: 9;
   color: ${({ theme }) => theme.text};
 `;
 
@@ -84,6 +88,9 @@ const Avatar = styled.img`
   border-radius: 50%;
   /* background-color: #999; */
 `;
+// function useQuery(){
+//   return new URLSearchParams(useLocation().search);
+// }
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -91,6 +98,8 @@ const Navbar = () => {
   const location = useLocation();
   const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage?.getItem('access_token')));
   const [open, setOpen] = useState(false);
+  const [search, setSerach] = useState('');
+  // const query = useQuery();
 
   const handleLogout = () => {
     dispatch(logout());
@@ -107,21 +116,22 @@ const Navbar = () => {
         handleLogout();
         }
       }
-  }, [currentUser, location]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser]);
 
   return (
     <>
       <Container>
         <Wrapper>
-          <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+          <Link to="/" style={{ textDecoration: "none", color: "inherit", cursor: "pointer" }}>
             <Logo>
               <Img src={YouTube} />
               YouTube
             </Logo>
           </Link>
           <Search>
-            <Input placeholder="Search" />
-            <SearchOutlinedIcon />
+            <Input placeholder="Search" onChange={e=>setSerach(e.target.value)} />
+            <SearchOutlinedIcon style={{cursor:'pointer', flex:'1'}} onClick={()=>navigate(`/search?searchQuery=${search}`)} />
           </Search>
           {currentUser ? (
             <User>

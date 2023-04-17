@@ -7,9 +7,9 @@ import axios from "axios";
 const Container = styled.div`
   width: ${(props) => props.type !== "sm" && "360px"};
   margin-bottom: ${(props) => (props.type === "sm" ? "10px" : "45px")};
-  cursor: pointer;
   display: ${(props) => props.type === "sm" && "flex"};
   gap: 10px;
+  user-select: none;
 `;
 
 const Image = styled.img`
@@ -72,25 +72,27 @@ const Card = ({ type, video }) => {
   },[videoCreatorId]);
 
   return (
-    <Link to={`/video/${video._id}`} style={{ textDecoration: "none" }}>
-      <Container type={type}>
+    <Container type={type}>
+      <Link to={`/video/${video._id}`} style={{ textDecoration: "none" }}>
         <Image
           type={type}
           src={video?.imgUrl}
         />
-        <Details type={type}>
-          <ChannelImage
-            type={type}
-            src={channel.img}
+      </Link>
+      <Details type={type}>
+        <ChannelImage
+          type={type}
+          src={channel.img}
           />
-          <Texts>
+        <Texts>
+          <Link to={`/video/${video._id}`} style={{ textDecoration: "none" }}>
             <Title>{video.title}</Title>
-            <ChannelName>{channel.name}</ChannelName>
-            <Info>{video.views} views • {moment(video.createdAt).fromNow()}</Info>
-          </Texts>
-        </Details>
-      </Container>
-    </Link>
+          </Link>
+          <ChannelName>{channel.name}</ChannelName>
+          <Info>{video.views} views • {moment(video.createdAt).fromNow()}</Info>
+        </Texts>
+      </Details>
+  </Container>
   );
 };
 

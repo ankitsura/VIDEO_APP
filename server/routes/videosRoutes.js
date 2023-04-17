@@ -8,8 +8,10 @@ router.get('/', getAllVideos);
 router.get('/find/:id', getVideo);
 router.get('/trend', trend);
 router.get('/random', random);
+
 router.get('/tags', getByTags);
 router.get('/search', search);
+
 router.get('/sub', verifyToken, subscribed);
 
 router.post('/', verifyToken, uploadVideo);

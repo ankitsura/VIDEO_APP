@@ -18,32 +18,32 @@ import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import SettingsBrightnessOutlinedIcon from "@mui/icons-material/SettingsBrightnessOutlined";
 import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
+
 const Container = styled.div`
   /* width */
   ::-webkit-scrollbar {
     width: 0px;
   }
 
-  flex: 1;
   background-color: ${({ theme }) => theme.bgLighter};
   height: 100vh;
   color: ${({ theme }) => theme.text};
   font-size: 14px;
   position: sticky;
-  top: 0;
+  top: 56px;
   overflow-y:scroll;
 `;
 const Wrapper = styled.div`
-  padding: 18px 26px;
+  padding: 5px 20px;
 `;
 
 const Item = styled.div`
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 10px;
   cursor: pointer;
   padding: 7.5px 0px;
-
+  width: 100%;
   &:hover {
     background-color: ${({ theme }) => theme.soft};
   }

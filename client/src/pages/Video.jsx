@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import styled from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 import { AddTaskOutlined, ReplyOutlined, ThumbUpOutlined, ThumbUpAlt, ThumbDownOffAltOutlined, ThumbDownAlt } from "@mui/icons-material";
 import Comments from "../components/Comments";
 import Card from "../components/Card";
@@ -8,16 +8,28 @@ import { dislikeVideo, getSingleVideo, handleSubscribeChannel, likeVideo } from 
 import { useDispatch, useSelector } from "react-redux";
 import { handleDislikeVideo, handleLikeVideo } from "../redux/videoSlice";
 import moment from "moment";
+import Recommendations from "../components/Recommendations";
+
+
 
 const Container = styled.div`
+::-webkit-scrollbar {
+    width: 0px;
+  }
   display: flex;
   gap: 24px;
 `;
 
 const Content = styled.div`
+::-webkit-scrollbar {
+    width: 0px;
+  }
   flex: 5;
+  height: var(100vh-56px);
+  overflow-y: scroll;
 `;
 const VideoWrapper = styled.div`
+position: relative;
 `;
 
 const Title = styled.h1`
@@ -36,6 +48,7 @@ const Details = styled.div`
 
 const Info = styled.span`
   color: ${({ theme }) => theme.textSoft};
+  cursor: context-menu;
 `;
 
 const Buttons = styled.div`
@@ -56,9 +69,6 @@ const Hr = styled.hr`
   border: 0.5px solid ${({ theme }) => theme.soft};
 `;
 
-const Recommendation = styled.div`
-  flex: 2;
-`;
 const Channel = styled.div`
   display: flex;
   justify-content: space-between;
@@ -136,19 +146,21 @@ const Video = () => {
 
   useEffect(() => {
     dispatch(getSingleVideo(videoId));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   },[videoId]);
 
   return (
     <Container>
       <Content>
         <VideoWrapper>
-          <VideoFrame src={video?.videoUrl} type="video/mp4" controls={true}/>
+          <VideoFrame src={video?.videoUrl} poster={video?.imgUrl} type="video/mp4" controls />
         </VideoWrapper>
         <Title>{video?.title}</Title>
         <Details>
           <Info>{(video?.views) ? video.views : 0} views • {moment(video?.createdAt).fromNow()}</Info>
           <Buttons>
-            { currentUser && 
+            { (currentUser) && 
+            ((currentUser?._id !== channel?._id) ?
               <>
                 <Button onClick={handleLike}>
                   {video?.likes?.includes(currentUser?._id) ? <ThumbUpAlt /> : <ThumbUpOutlined />} {video?.likes?.length}
@@ -157,7 +169,16 @@ const Video = () => {
                 {video?.dislikes?.includes(currentUser?._id) ? <ThumbDownAlt /> : <ThumbDownOffAltOutlined />} {video?.dislikes?.length}
                 </Button>
               </>
-            }
+              :
+              <>
+                <Button style={{cursor: 'default'}}>
+                  <ThumbUpAlt /> {video?.likes?.length}
+                </Button>
+                <Button style={{cursor: 'default'}}>
+                  <ThumbDownAlt /> {video?.dislikes?.length}
+                </Button>
+              </>
+            )}
             <Button>
               <ReplyOutlined /> Share
             </Button>
@@ -178,30 +199,16 @@ const Video = () => {
               </Description>
             </ChannelDetail>
           </ChannelInfo>
-          { !currentUser ?
+          {(!currentUser) ?
             <Subscribe style={{cursor:'unset', backgroundColor: 'grey'}}>SUBSCRIBE</Subscribe>
             :
-            <Subscribe onClick={toogleSubscribe}>{isSubscribed ? `SUBSCRIBED` : `SUBSCRIBE`}</Subscribe>
+            (currentUser?._id !== channel?._id) && <Subscribe onClick={toogleSubscribe}>{isSubscribed ? `SUBSCRIBED` : `SUBSCRIBE`}</Subscribe>
           }
         </Channel>
         <Hr />
         <Comments videoId={videoId} currentUser={currentUser} />
       </Content>
-      {/* <Recommendation>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-      </Recommendation> */}
+      <Recommendations tags={video?.tags}/>
     </Container>
   );
 };

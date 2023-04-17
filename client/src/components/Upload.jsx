@@ -16,7 +16,7 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1;
+  z-index: 100;
 `;
 
 const Wrapper = styled.div`
@@ -135,40 +135,42 @@ const Upload = ({setOpen}) => {
     e.preventDefault();
     const res = await uploadVideo(data);
     setOpen(false);
-    (res.status === 200) && navigate(`/video/${res._id}`);
+    if(res.status === 200) navigate(`/video/${res._id}`);
   }
 
   useEffect(() => {
     data?.videoUrl && uploadFile(data.videoUrl, "videoUrl");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   },[data.videoUrl]);
 
   useEffect(() => {
     data?.imgUrl && uploadFile(data?.imgUrl, "imgUrl");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   },[data.imgUrl]);
 
 
   return (
     <Container>
-        <Wrapper>
-          <Title>Upload New Video</Title>
-          <Close onClick={()=> setOpen(false)} >X</Close>
-          <Form> 
-            <Label>Video:</Label>
-            {
-              uploadProgress.videoProgress > 0 ? ("Uploading:" + (Math.round(uploadProgress.videoProgress)) + '%') :
-              <Input name='videoUrl' type='file' accept='video/*' onChange={handleChange} />
-            }
-            <Input name='title' type='text' onChange={handleChange} placeholder='Video Title' />
-            <Description name='desc' placeholder='description' rows={8} onChange={handleChange} /> 
-            <Input name='tags' type='text' placeholder='Coma separated tags' onChange={handleChange} />
-            <Label>Image:</Label>
-            {
-              uploadProgress.imgProgress > 0 ? ("Uploading:" + (Math.round(uploadProgress.imgProgress)) + '%') :
-              <Input name='imgUrl' type='file' accept='image/*' onChange={handleChange} />
-            }
-            <Button onClick={handleSubmit} type='submit'>Upload</Button>
-          </Form>
-        </Wrapper>
+      <Wrapper>
+        <Title>Upload New Video</Title>
+        <Close onClick={()=> setOpen(false)} >X</Close>
+        <Form> 
+          <Label>Video:</Label>
+          {
+            uploadProgress.videoProgress > 0 ? ("Uploading:" + (Math.round(uploadProgress.videoProgress)) + '%') :
+            <Input name='videoUrl' type='file' accept='video/*' onChange={handleChange} />
+          }
+          <Input name='title' type='text' onChange={handleChange} placeholder='Video Title' />
+          <Description name='desc' placeholder='description' rows={8} onChange={handleChange} /> 
+          <Input name='tags' type='text' placeholder='Coma separated tags' onChange={handleChange} />
+          <Label>Image:</Label>
+          {
+            uploadProgress.imgProgress > 0 ? ("Uploading:" + (Math.round(uploadProgress.imgProgress)) + '%') :
+            <Input name='imgUrl' type='file' accept='image/*' onChange={handleChange} />
+          }
+          <Button onClick={handleSubmit} type='submit'>Upload</Button>
+        </Form>
+      </Wrapper>
     </Container>
   );
 }
